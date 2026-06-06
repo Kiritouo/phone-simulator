@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手機模擬器</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --phone-w: 320px;
+    --phone-h: 640px;
+    --screen-on: #0a0a1a;
+    --screen-off: #050508;
+    --accent: #00e5ff;
+    --accent2: #7c4dff;
+    --btn-color: #1a1a2e;
+    --btn-press: #0d0d1f;
+    --frame: #1c1c2e;
+    --frame-light: #2a2a3e;
+    --frame-dark: #0d0d1a;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 30% 20%, #1a0a2e 0%, #050510 50%, #000005 100%);
+    font-family: 'Noto Sans TC', sans-serif;
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
+  /* Ambient light effect behind phone */
+  .phone-glow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .phone-glow::before {
+    content: '';
+    position: absolute;
+    width: calc(var(--phone-w) + 80px);
+    height: calc(var(--phone-h) + 80px);
+    border-radius: 80px;
+    background: radial-gradient(ellipse, rgba(0,229,255,0.08) 0%, transparent 70%);
+    transition: background 0.5s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .phone-glow.screen-on::before {
+    background: radial-gradient(ellipse, rgba(0,229,255,0.25) 0%, rgba(124,77,255,0.1) 40%, transparent 70%);
+  }
+
+  /* === PHONE FRAME === */
+  .phone {
+    position: relative;
+    width: var(--phone-w);
+    height: var(--phone-h);
+    background: linear-gradient(160deg, var(--frame-light) 0%, var(--frame) 40%, var(--frame-dark) 100%);
+    border-radius: 52px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.08),
+      0 0 0 2px rgba(0,0,0,0.6),
+      4px 4px 12px rgba(0,0,0,0.8),
+      -2px -2px 8px rgba(255,255,255,0.04),
+      inset 0 1px 1px rgba(255,255,255,0.12);
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Metal shine on frame */
+  .phone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 52px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* === SIDE BUTTONS === */
+  .btn-power {
+    position: absolute;
+    right: -4px;
+    top: 160px;
+    width: 5px;
+    height: 64px;
+    background: linear-gradient(to right, var(--frame-dark), #2e2e46);
+    border-radius: 0 4px 4px 0;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.6), inset -1px 0 2px rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    z-index: 5;
+  }
+
+  .btn-vol-up {
+    position: absolute;
+    left: -4px;
+    top: 140px;
+    width: 5px;
+    height: 52px;
+    background: linear-gradient(to left, var(--frame-dark), #2e2e46);
+    border-radius: 4px 0 0 4px;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.6), inset 1px 0 2px rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    z-index: 5;
+  }
+
+  .btn-vol-down {
+    position: absolute;
+    left: -4px;
+    top: 204px;
+    width: 5px;
+    height: 52px;
+    background: linear-gradient(to left, var(--frame-dark), #2e2e46);
+    border-radius: 4px 0 0 4px;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.6), inset 1px 0 2px rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    z-index: 5;
+  }
+
+  .btn-power:active, .btn-power.pressed {
+    transform: translateX(2px);
+    box-shadow: 0 0 4px rgba(0,229,255,0.4), inset -1px 0 2px rgba(0,229,255,0.3);
+  }
+
+  .btn-vol-up:active, .btn-vol-up.pressed,
+  .btn-vol-down:active, .btn-vol-down.pressed {
+    transform: translateX(-2px);
+    box-shadow: 0 0 4px rgba(124,77,255,0.5), inset 1px 0 2px rgba(124,77,255,0.3);
+  }
+
+  /* Button labels (tooltip style) */
+  .btn-label {
+    position: absolute;
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.3);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: color 0.2s, opacity 0.2s;
+    opacity: 0;
+  }
+
+  .btn-power:hover ~ .label-power,
+  .btn-vol-up:hover ~ .label-vol-up,
+  .btn-vol-down:hover ~ .label-vol-down {
+    opacity: 1;
+  }
+
+  .label-power {
+    right: 16px;
+    top: 178px;
+    transform: translateY(-50%);
+  }
+
+  .label-vol-up {
+    left: 16px;
+    top: 166px;
+    transform: translateY(-50%);
+  }
+
+  .label-vol-down {
+    left: 16px;
+    top: 230px;
+    transform: translateY(-50%);
+  }
+
+  /* === SCREEN === */
+  .screen {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    background: var(--screen-off);
+    border-radius: 40px;
+    overflow: hidden;
+    transition: background 0.4s ease;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+  }
+
+  .screen-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.1s;
+  }
+
+  .phone.on .screen {
+    background: var(--screen-on);
+  }
+
+  .phone.on .screen-inner {
+    opacity: 1;
+  }
+
+  /* Lock screen glow */
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 40px;
+    background: radial-gradient(ellipse at 50% 30%, rgba(0,229,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .phone.on .screen::after { opacity: 1; }
+
+  /* Screen reflection */
+  .screen::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.04), transparent);
+    border-radius: 40px 40px 0 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* === NOTCH === */
+  .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 30px;
+    background: #050508;
+    border-radius: 0 0 20px 20px;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .notch-camera {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0a0a14;
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+  }
+
+  .notch-camera::after {
+    content: '';
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(0,229,255,0.4);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+  .notch-speaker {
+    width: 40px;
+    height: 4px;
+    background: #0a0a14;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* === STATUS BAR === */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 20px 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Orbitron', monospace;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  .status-time {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  /* === LOCK SCREEN CONTENT === */
+  .lock-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .lock-date {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .lock-time {
+    font-family: 'Orbitron', monospace;
+    font-size: 56px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 30px rgba(0,229,255,0.4), 0 0 60px rgba(0,229,255,0.2);
+    line-height: 1;
+  }
+
+  .lock-swipe {
+    margin-top: 24px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 3px;
+    font-family: 'Orbitron', monospace;
+    animation: pulse-text 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-text {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Wallpaper gradient */
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(124,77,255,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 30%, rgba(0,229,255,0.1) 0%, transparent 50%),
+      linear-gradient(180deg, #050510 0%, #0a0520 50%, #050510 100%);
+    z-index: 0;
+  }
+
+  .screen-inner > * { position: relative; z-index: 1; }
+  .screen-inner > .wallpaper { z-index: 0; }
+
+  /* === VOLUME INDICATOR === */
+  .volume-hud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(10,10,26,0.9);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 16px;
+    padding: 16px 20px;
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    min-width: 120px;
+  }
+
+  .volume-hud.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .volume-hud-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(0,229,255,0.7);
+    text-transform: uppercase;
+  }
+
+  .volume-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .volume-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--accent2), var(--accent));
+    transition: width 0.15s ease;
+    box-shadow: 0 0 8px rgba(0,229,255,0.5);
+  }
+
+  .volume-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  /* === POWER ON ANIMATION === */
+  .boot-flash {
+    position: absolute;
+    inset: 0;
+    background: white;
+    border-radius: 40px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: opacity 0.1s ease;
+  }
+
+  .boot-flash.flash {
+    animation: flash-anim 0.4s ease forwards;
+  }
+
+  @keyframes flash-anim {
+    0% { opacity: 0; }
+    20% { opacity: 0.15; }
+    100% { opacity: 0; }
+  }
+
+  /* === POWER OFF === */
+  .poweroff-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 40px;
+    background: black;
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .poweroff-overlay.show {
+    opacity: 1;
+  }
+
+  /* === HOME BAR === */
+  .home-bar {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 2px;
+    z-index: 15;
+  }
+
+  /* === FEEDBACK TOAST === */
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(10,10,26,0.92);
+    border: 1px solid rgba(0,229,255,0.15);
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(20px);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* === RIPPLE === */
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0,229,255,0.15);
+    transform: scale(0);
+    animation: ripple-anim 0.4s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes ripple-anim {
+    to { transform: scale(4); opacity: 0; }
+  }
+
+  /* === HAPTIC INDICATOR === */
+  @keyframes haptic {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1.5px); }
+    75% { transform: translateX(1.5px); }
+  }
+
+  .phone.haptic {
+    animation: haptic 0.1s ease 2;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 480px) {
+    :root {
+      --phone-w: 280px;
+      --phone-h: 560px;
+    }
+    .lock-time { font-size: 44px; }
+    body { padding: 10px; }
+  }
+
+  /* === INSTRUCTIONS === */
+  .instructions {
+    position: fixed;
+    bottom: 20px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+    z-index: 100;
+    text-transform: uppercase;
+  }
+
+  .instructions span {
+    margin: 0 8px;
+  }
+
+  /* Stars background */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op); }
+    50% { opacity: var(--max-op); }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="phone-glow" id="phoneGlow">
+  <div class="phone" id="phone">
+
+    <!-- Side buttons -->
+    <div class="btn-power" id="btnPower" title="電源鍵"></div>
+    <div class="btn-vol-up" id="btnVolUp" title="音量+"></div>
+    <div class="btn-vol-down" id="btnVolDown" title="音量-"></div>
+
+    <!-- Floating labels -->
+    <div class="btn-label label-power">POWER</div>
+    <div class="btn-label label-vol-up">VOL +</div>
+    <div class="btn-label label-vol-down">VOL −</div>
+
+    <!-- Screen -->
+    <div class="screen" id="screen">
+      <div class="wallpaper"></div>
+
+      <!-- Notch -->
+      <div class="notch">
+        <div class="notch-speaker"></div>
+        <div class="notch-camera"></div>
+      </div>
+
+      <!-- Screen Content -->
+      <div class="screen-inner" id="screenInner">
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span class="status-time" id="statusTime">00:00</span>
+          <div class="status-icons">
+            <span>▲▲▲</span>
+            <span>WiFi</span>
+            <span>🔋</span>
+          </div>
+        </div>
+
+        <!-- Lock Screen -->
+        <div class="lock-screen">
+          <div class="lock-date" id="lockDate">週五・6月5日</div>
+          <div class="lock-time" id="lockTime">00:00</div>
+          <div class="lock-swipe">— 滑動解鎖 —</div>
+        </div>
+      </div>
+
+      <!-- Volume HUD -->
+      <div class="volume-hud" id="volumeHud">
+        <div class="volume-hud-label">音量</div>
+        <div class="volume-number" id="volumeNumber">50</div>
+        <div class="volume-bar-wrap">
+          <div class="volume-bar-fill" id="volumeBarFill" style="width:50%"></div>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div class="toast" id="toast"></div>
+
+      <!-- Boot flash -->
+      <div class="boot-flash" id="bootFlash"></div>
+      <!-- Power off overlay -->
+      <div class="poweroff-overlay" id="poweroffOverlay"></div>
+
+      <!-- Home bar -->
+      <div class="home-bar"></div>
+    </div>
+  </div>
+</div>
+
+<div class="instructions">
+  <span>右側按鍵 = 電源</span>
+  <span>左側上鍵 = 音量+</span>
+  <span>左側下鍵 = 音量−</span>
+</div>
+
+<script>
+  // === STATE ===
+  let isOn = false;
+  let volume = 50;
+  let volHudTimer = null;
+  let toastTimer = null;
+
+  // === ELEMENTS ===
+  const phone = document.getElementById('phone');
+  const phoneGlow = document.getElementById('phoneGlow');
+  const btnPower = document.getElementById('btnPower');
+  const btnVolUp = document.getElementById('btnVolUp');
+  const btnVolDown = document.getElementById('btnVolDown');
+  const volumeHud = document.getElementById('volumeHud');
+  const volumeNumber = document.getElementById('volumeNumber');
+  const volumeBarFill = document.getElementById('volumeBarFill');
+  const bootFlash = document.getElementById('bootFlash');
+  const poweroffOverlay = document.getElementById('poweroffOverlay');
+  const toast = document.getElementById('toast');
+  const statusTime = document.getElementById('statusTime');
+  const lockTime = document.getElementById('lockTime');
+  const lockDate = document.getElementById('lockDate');
+
+  // === CLOCK ===
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = `${h}:${m}`;
+    statusTime.textContent = timeStr;
+    lockTime.textContent = timeStr;
+
+    const days = ['週日','週一','週二','週三','週四','週五','週六'];
+    const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    lockDate.textContent = `${days[now.getDay()]}・${months[now.getMonth()]}${now.getDate()}日`;
+  }
+  updateClock();
+  setInterval(updateClock, 5000);
+
+  // === HAPTIC (visual) ===
+  function haptic() {
+    phone.classList.remove('haptic');
+    void phone.offsetWidth;
+    phone.classList.add('haptic');
+    phone.addEventListener('animationend', () => phone.classList.remove('haptic'), { once: true });
+  }
+
+  // === TOAST ===
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // === RIPPLE ===
+  function createRipple(el) {
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.width = r.style.height = '20px';
+    r.style.left = '50%';
+    r.style.top = '50%';
+    r.style.marginLeft = '-10px';
+    r.style.marginTop = '-10px';
+    el.appendChild(r);
+    r.addEventListener('animationend', () => r.remove());
+  }
+
+  // === POWER ===
+  function togglePower() {
+    haptic();
+    if (!isOn) {
+      // Turn on
+      bootFlash.classList.add('flash');
+      bootFlash.addEventListener('animationend', () => bootFlash.classList.remove('flash'), { once: true });
+      isOn = true;
+      phone.classList.add('on');
+      phoneGlow.classList.add('screen-on');
+      setTimeout(() => showToast('已開機'), 300);
+    } else {
+      // Turn off
+      poweroffOverlay.classList.add('show');
+      setTimeout(() => {
+        isOn = false;
+        phone.classList.remove('on');
+        phoneGlow.classList.remove('screen-on');
+        poweroffOverlay.classList.remove('show');
+      }, 500);
+      showToast('已關機');
+    }
+  }
+
+  // === VOLUME ===
+  function showVolumeHud() {
+    volumeNumber.textContent = volume;
+    volumeBarFill.style.width = volume + '%';
+    volumeHud.classList.add('show');
+    clearTimeout(volHudTimer);
+    volHudTimer = setTimeout(() => volumeHud.classList.remove('show'), 1500);
+  }
+
+  function changeVolume(delta) {
+    haptic();
+    if (!isOn) {
+      showToast('請先開機');
+      return;
+    }
+    volume = Math.max(0, Math.min(100, volume + delta));
+    showVolumeHud();
+    if (volume === 0) showToast('靜音');
+    else if (volume === 100) showToast('最大音量');
+  }
+
+  // === BUTTON EVENTS ===
+
+  // Power button
+  function addButtonEvents(el, action) {
+    el.addEventListener('mousedown', (e) => {
+      el.classList.add('pressed');
+      createRipple(e.currentTarget);
+    });
+    el.addEventListener('mouseup', () => {
+      el.classList.remove('pressed');
+      action();
+    });
+    el.addEventListener('mouseleave', () => el.classList.remove('pressed'));
+
+    // Touch
+    el.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      el.classList.add('pressed');
+    }, { passive: false });
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      el.classList.remove('pressed');
+      action();
+    }, { passive: false });
+  }
+
+  addButtonEvents(btnPower, togglePower);
+  addButtonEvents(btnVolUp, () => changeVolume(10));
+  addButtonEvents(btnVolDown, () => changeVolume(-10));
+
+  // === KEYBOARD SHORTCUTS ===
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'p' || e.key === 'P') togglePower();
+    if (e.key === 'ArrowUp') changeVolume(10);
+    if (e.key === 'ArrowDown') changeVolume(-10);
+  });
+
+  // === STARS ===
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      left: ${Math.random()*100}vw;
+      top: ${Math.random()*100}vh;
+      --dur: ${2 + Math.random()*4}s;
+      --delay: ${Math.random()*4}s;
+      --min-op: ${0.05 + Math.random()*0.1};
+      --max-op: ${0.3 + Math.random()*0.5};
+    `;
+    starsEl.appendChild(s);
+  }
+</script>
+</body>
+</html>
