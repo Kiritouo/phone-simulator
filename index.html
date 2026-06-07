@@ -31,7 +31,7 @@
     background: #f0f0f0;
     font-family: 'Noto Sans TC', sans-serif;
     overflow-x: hidden;
-    padding: 40px 100px;
+    padding: 40px 40px;
   }
 
   /* Ambient light effect behind phone */
@@ -87,110 +87,101 @@
     z-index: 10;
   }
 
-  /* === SIDE BUTTONS === */
+  /* === SIDE BUTTONS — 實體側鍵樣式 === */
+
+  /* 電源鍵：右側，緊貼機身 */
   .btn-power {
     position: absolute;
-    right: -60px;
-    top: 148px;
-    width: 52px;
-    height: 84px;
-    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
-    border: 1.5px solid #bbb;
+    right: -7px;           /* 緊貼右側，露出一截 */
+    top: 180px;
+    width: 7px;
+    height: 68px;
+    background: linear-gradient(to right,
+      #3a3a3a 0%,          /* 貼機身面：與機身同色 */
+      #4a4a4a 30%,
+      #565656 60%,         /* 頂面：稍亮，有厚度感 */
+      #3e3e3e 100%
+    );
+    border-radius: 0 4px 4px 0;
+    box-shadow:
+      2px 0 0 rgba(255,255,255,0.08),   /* 頂邊高光 */
+      3px 1px 6px rgba(0,0,0,0.5),      /* 外側陰影 */
+      inset -1px 0 2px rgba(0,0,0,0.4); /* 內側暗部 */
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    z-index: 6;
+    transition: transform 0.07s ease, filter 0.07s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .btn-power-icon {
-    font-size: 20px;
-    line-height: 1;
-    pointer-events: none;
+  .btn-power:active, .btn-power.pressed {
+    transform: translateX(2px) scaleX(0.75);
+    filter: brightness(0.8);
+    box-shadow:
+      1px 0 0 rgba(255,255,255,0.05),
+      1px 1px 3px rgba(0,0,0,0.5),
+      inset -2px 0 4px rgba(0,0,0,0.6);
   }
 
-  .btn-power-text {
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #444;
-    letter-spacing: 0.5px;
-    pointer-events: none;
-  }
-
+  /* 音量鍵：左側，緊貼機身 */
   .btn-vol-up {
     position: absolute;
-    left: -60px;
-    top: 128px;
-    width: 52px;
-    height: 76px;
-    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
-    border: 1.5px solid #bbb;
+    left: -7px;
+    top: 150px;
+    width: 7px;
+    height: 60px;
+    background: linear-gradient(to left,
+      #3a3a3a 0%,
+      #4a4a4a 30%,
+      #565656 60%,
+      #3e3e3e 100%
+    );
+    border-radius: 4px 0 0 4px;
+    box-shadow:
+      -2px 0 0 rgba(255,255,255,0.08),
+      -3px 1px 6px rgba(0,0,0,0.5),
+      inset 1px 0 2px rgba(0,0,0,0.4);
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    z-index: 6;
+    transition: transform 0.07s ease, filter 0.07s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-vol-down {
     position: absolute;
-    left: -60px;
-    top: 216px;
-    width: 52px;
-    height: 76px;
-    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
-    border: 1.5px solid #bbb;
+    left: -7px;
+    top: 222px;
+    width: 7px;
+    height: 60px;
+    background: linear-gradient(to left,
+      #3a3a3a 0%,
+      #4a4a4a 30%,
+      #565656 60%,
+      #3e3e3e 100%
+    );
+    border-radius: 4px 0 0 4px;
+    box-shadow:
+      -2px 0 0 rgba(255,255,255,0.08),
+      -3px 1px 6px rgba(0,0,0,0.5),
+      inset 1px 0 2px rgba(0,0,0,0.4);
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-  }
-
-  .btn-vol-icon {
-    font-size: 18px;
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  .btn-vol-text {
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #444;
-    letter-spacing: 0.5px;
-    pointer-events: none;
-  }
-
-  .btn-power:active, .btn-power.pressed {
-    transform: scale(0.92);
-    background: linear-gradient(160deg, #c8c8c8 0%, #b8b8b8 100%);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.18);
+    z-index: 6;
+    transition: transform 0.07s ease, filter 0.07s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-vol-up:active, .btn-vol-up.pressed,
   .btn-vol-down:active, .btn-vol-down.pressed {
-    transform: scale(0.92);
-    background: linear-gradient(160deg, #c8c8c8 0%, #b8b8b8 100%);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.18);
+    transform: translateX(-2px) scaleX(0.75);
+    filter: brightness(0.8);
+    box-shadow:
+      -1px 0 0 rgba(255,255,255,0.05),
+      -1px 1px 3px rgba(0,0,0,0.5),
+      inset 2px 0 4px rgba(0,0,0,0.6);
   }
 
+  /* 清除舊的 icon/text 子元素（不再顯示） */
+  .btn-power-icon, .btn-power-text,
+  .btn-vol-icon, .btn-vol-text,
   .btn-label { display: none; }
 
   /* === SCREEN === */
@@ -614,18 +605,9 @@
   <div class="phone" id="phone">
 
     <!-- Side buttons -->
-    <div class="btn-power" id="btnPower">
-      <span class="btn-power-icon">⏻</span>
-      <span class="btn-power-text">電源</span>
-    </div>
-    <div class="btn-vol-up" id="btnVolUp">
-      <span class="btn-vol-icon">🔊</span>
-      <span class="btn-vol-text">音量+</span>
-    </div>
-    <div class="btn-vol-down" id="btnVolDown">
-      <span class="btn-vol-icon">🔉</span>
-      <span class="btn-vol-text">音量−</span>
-    </div>
+    <div class="btn-power" id="btnPower"></div>
+    <div class="btn-vol-up" id="btnVolUp"></div>
+    <div class="btn-vol-down" id="btnVolDown"></div>
 
     <!-- Screen -->
     <div class="screen" id="screen">
@@ -681,9 +663,10 @@
 </div>
 
 <div class="instructions">
-  <span>右側按鍵 = 電源</span>
+  <span>右側鍵 = 電源開關</span>
   <span>左側上鍵 = 音量+</span>
   <span>左側下鍵 = 音量−</span>
+  <span>鍵盤：P / ↑ / ↓</span>
 </div>
 
 <script>
