@@ -28,10 +28,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(ellipse at 30% 20%, #1a0a2e 0%, #050510 50%, #000005 100%);
+    background: #f0f0f0;
     font-family: 'Noto Sans TC', sans-serif;
     overflow-x: hidden;
-    padding: 20px;
+    padding: 40px 100px;
   }
 
   /* Ambient light effect behind phone */
@@ -90,93 +90,108 @@
   /* === SIDE BUTTONS === */
   .btn-power {
     position: absolute;
-    right: -4px;
-    top: 160px;
-    width: 5px;
-    height: 64px;
-    background: linear-gradient(to right, var(--frame-dark), #2e2e46);
-    border-radius: 0 4px 4px 0;
-    box-shadow: 2px 0 6px rgba(0,0,0,0.6), inset -1px 0 2px rgba(255,255,255,0.08);
+    right: -60px;
+    top: 148px;
+    width: 52px;
+    height: 84px;
+    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
+    border: 1.5px solid #bbb;
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .btn-power-icon {
+    font-size: 20px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .btn-power-text {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #444;
+    letter-spacing: 0.5px;
+    pointer-events: none;
   }
 
   .btn-vol-up {
     position: absolute;
-    left: -4px;
-    top: 140px;
-    width: 5px;
-    height: 52px;
-    background: linear-gradient(to left, var(--frame-dark), #2e2e46);
-    border-radius: 4px 0 0 4px;
-    box-shadow: -2px 0 6px rgba(0,0,0,0.6), inset 1px 0 2px rgba(255,255,255,0.08);
+    left: -60px;
+    top: 128px;
+    width: 52px;
+    height: 76px;
+    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
+    border: 1.5px solid #bbb;
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
   }
 
   .btn-vol-down {
     position: absolute;
-    left: -4px;
-    top: 204px;
-    width: 5px;
-    height: 52px;
-    background: linear-gradient(to left, var(--frame-dark), #2e2e46);
-    border-radius: 4px 0 0 4px;
-    box-shadow: -2px 0 6px rgba(0,0,0,0.6), inset 1px 0 2px rgba(255,255,255,0.08);
+    left: -60px;
+    top: 216px;
+    width: 52px;
+    height: 76px;
+    background: linear-gradient(160deg, #e8e8e8 0%, #d0d0d0 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.1);
+    border: 1.5px solid #bbb;
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .btn-vol-icon {
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .btn-vol-text {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #444;
+    letter-spacing: 0.5px;
+    pointer-events: none;
   }
 
   .btn-power:active, .btn-power.pressed {
-    transform: translateX(2px);
-    box-shadow: 0 0 4px rgba(0,229,255,0.4), inset -1px 0 2px rgba(0,229,255,0.3);
+    transform: scale(0.92);
+    background: linear-gradient(160deg, #c8c8c8 0%, #b8b8b8 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.18);
   }
 
   .btn-vol-up:active, .btn-vol-up.pressed,
   .btn-vol-down:active, .btn-vol-down.pressed {
-    transform: translateX(-2px);
-    box-shadow: 0 0 4px rgba(124,77,255,0.5), inset 1px 0 2px rgba(124,77,255,0.3);
+    transform: scale(0.92);
+    background: linear-gradient(160deg, #c8c8c8 0%, #b8b8b8 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.18);
   }
 
-  /* Button labels (tooltip style) */
-  .btn-label {
-    position: absolute;
-    font-family: 'Orbitron', monospace;
-    font-size: 8px;
-    letter-spacing: 1px;
-    color: rgba(255,255,255,0.3);
-    white-space: nowrap;
-    pointer-events: none;
-    transition: color 0.2s, opacity 0.2s;
-    opacity: 0;
-  }
-
-  .btn-power:hover ~ .label-power,
-  .btn-vol-up:hover ~ .label-vol-up,
-  .btn-vol-down:hover ~ .label-vol-down {
-    opacity: 1;
-  }
-
-  .label-power {
-    right: 16px;
-    top: 178px;
-    transform: translateY(-50%);
-  }
-
-  .label-vol-up {
-    left: 16px;
-    top: 166px;
-    transform: translateY(-50%);
-  }
-
-  .label-vol-down {
-    left: 16px;
-    top: 230px;
-    transform: translateY(-50%);
-  }
+  .btn-label { display: none; }
 
   /* === SCREEN === */
   .screen {
@@ -532,7 +547,7 @@
       --phone-h: 560px;
     }
     .lock-time { font-size: 44px; }
-    body { padding: 10px; }
+    body { padding: 20px 60px; }
   }
 
   /* === INSTRUCTIONS === */
@@ -544,7 +559,7 @@
     font-family: 'Orbitron', monospace;
     font-size: 18px;
     letter-spacing: 1.5px;
-    color: rgba(255,255,255,0.7);
+    color: #444;
     z-index: 100;
     text-transform: uppercase;
     display: flex;
@@ -556,8 +571,8 @@
   }
 
   .instructions span {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.15);
     border-radius: 24px;
     padding: 8px 22px;
     font-size: 16px;
@@ -568,8 +583,8 @@
     .instructions span { font-size: 13px; padding: 6px 14px; }
   }
 
-  /* Stars background */
-  .stars {
+  /* Stars background (hidden on light bg) */
+  .stars { display: none; } .stars-x {
     position: fixed;
     inset: 0;
     pointer-events: none;
@@ -599,14 +614,18 @@
   <div class="phone" id="phone">
 
     <!-- Side buttons -->
-    <div class="btn-power" id="btnPower" title="電源鍵"></div>
-    <div class="btn-vol-up" id="btnVolUp" title="音量+"></div>
-    <div class="btn-vol-down" id="btnVolDown" title="音量-"></div>
-
-    <!-- Floating labels -->
-    <div class="btn-label label-power">POWER</div>
-    <div class="btn-label label-vol-up">VOL +</div>
-    <div class="btn-label label-vol-down">VOL −</div>
+    <div class="btn-power" id="btnPower">
+      <span class="btn-power-icon">⏻</span>
+      <span class="btn-power-text">電源</span>
+    </div>
+    <div class="btn-vol-up" id="btnVolUp">
+      <span class="btn-vol-icon">🔊</span>
+      <span class="btn-vol-text">音量+</span>
+    </div>
+    <div class="btn-vol-down" id="btnVolDown">
+      <span class="btn-vol-icon">🔉</span>
+      <span class="btn-vol-text">音量−</span>
+    </div>
 
     <!-- Screen -->
     <div class="screen" id="screen">
