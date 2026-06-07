@@ -72,6 +72,7 @@
       -2px -2px 8px rgba(255,255,255,0.04),
       inset 0 1px 1px rgba(255,255,255,0.12);
     z-index: 1;
+    overflow: visible;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -541,6 +542,80 @@
     body { padding: 20px 60px; }
   }
 
+
+  /* === BUTTON ARROW LABELS === */
+  .btn-arrows {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .arrow-label {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .arrow-label-text {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #333;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 20px;
+    padding: 3px 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    line-height: 1.4;
+  }
+
+  .arrow-line {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Power btn: right:-7px, top:180px, h:68px → center at top:214px */
+  .arrow-power {
+    right: 0;              /* flush with right edge of phone */
+    top: 214px;
+    transform: translate(100%, -50%); /* push entirely outside phone to the right */
+    flex-direction: row;   /* SVG arrow then text */
+    padding-right: 4px;
+  }
+
+  /* Vol up: left:-7px, top:150px, h:60px → center at top:180px */
+  .arrow-vol-up {
+    left: 0;
+    top: 180px;
+    transform: translate(-100%, -50%); /* push entirely outside phone to the left */
+    flex-direction: row-reverse; /* text then SVG arrow */
+    padding-left: 4px;
+  }
+
+  /* Vol down: left:-7px, top:222px, h:60px → center at top:252px */
+  .arrow-vol-down {
+    left: 0;
+    top: 252px;
+    transform: translate(-100%, -50%);
+    flex-direction: row-reverse;
+    padding-left: 4px;
+  }
+
+  /* SVG arrow lines */
+  .arrow-svg {
+    overflow: visible;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 580px) {
+    /* On narrow screens hide arrow labels to avoid overflow */
+    .btn-arrows { display: none; }
+  }
+
   /* === INSTRUCTIONS === */
   .instructions {
     position: fixed;
@@ -601,13 +676,41 @@
 
 <div class="stars" id="stars"></div>
 
-<div class="phone-glow" id="phoneGlow">
+<div class="phone-glow" id="phoneGlow" style="position:relative; overflow:visible;">
   <div class="phone" id="phone">
 
     <!-- Side buttons -->
     <div class="btn-power" id="btnPower"></div>
     <div class="btn-vol-up" id="btnVolUp"></div>
     <div class="btn-vol-down" id="btnVolDown"></div>
+
+    <!-- Arrow labels (inside phone, overflow:visible so they appear outside frame) -->
+    <div class="btn-arrows">
+      <!-- Power: right side -->
+      <div class="arrow-label arrow-power">
+        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
+          <line x1="0" y1="7" x2="26" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <polygon points="26,3 32,7 26,11" fill="#555"/>
+        </svg>
+        <div class="arrow-label-text">電源鍵</div>
+      </div>
+      <!-- Vol Up: left side -->
+      <div class="arrow-label arrow-vol-up">
+        <div class="arrow-label-text">音量 +</div>
+        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
+          <line x1="32" y1="7" x2="6" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <polygon points="6,3 0,7 6,11" fill="#555"/>
+        </svg>
+      </div>
+      <!-- Vol Down: left side -->
+      <div class="arrow-label arrow-vol-down">
+        <div class="arrow-label-text">音量 −</div>
+        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
+          <line x1="32" y1="7" x2="6" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <polygon points="6,3 0,7 6,11" fill="#555"/>
+        </svg>
+      </div>
+    </div>
 
     <!-- Screen -->
     <div class="screen" id="screen">
