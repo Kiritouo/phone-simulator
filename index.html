@@ -72,7 +72,6 @@
       -2px -2px 8px rgba(255,255,255,0.04),
       inset 0 1px 1px rgba(255,255,255,0.12);
     z-index: 1;
-    overflow: visible;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -543,77 +542,88 @@
   }
 
 
-  /* === BUTTON ARROW LABELS === */
+  /* === BUTTON ARROW LABELS (inside screen, pointing outward) === */
+
+  /* Container lives inside .screen, sits on top of everything */
   .btn-arrows {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 20;
+    z-index: 50;
+    border-radius: 40px;
+    overflow: hidden;       /* never bleeds outside the screen bezel */
   }
 
   .arrow-label {
     position: absolute;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     pointer-events: none;
     white-space: nowrap;
+    /* fade out after 4s so it doesn't obscure the UI forever */
+    animation: arrow-fade 4s ease forwards;
+    animation-delay: 0.5s;
+    opacity: 1;
+  }
+
+  @keyframes arrow-fade {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
   }
 
   .arrow-label-text {
     font-family: 'Noto Sans TC', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: #333;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(0,0,0,0.12);
+    color: #fff;
+    background: rgba(0,0,0,0.62);
+    border: 1px solid rgba(255,255,255,0.18);
     border-radius: 20px;
-    padding: 3px 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    padding: 4px 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     line-height: 1.4;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
-  .arrow-line {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Power btn: right:-7px, top:180px, h:68px → center at top:214px */
+  /* ── Power: anchored to right edge of screen, pointing RIGHT ── */
+  /* screen right edge = phone right edge - 16px bezel = aligns near button */
+  /* btn-power center from top of phone = 180+34=214px; screen top=16px → 214-16=198px from screen top */
   .arrow-power {
-    right: 0;              /* flush with right edge of phone */
-    top: 214px;
-    transform: translate(100%, -50%); /* push entirely outside phone to the right */
-    flex-direction: row;   /* SVG arrow then text */
-    padding-right: 4px;
+    right: 8px;
+    top: 198px;
+    transform: translateY(-50%);
+    flex-direction: row-reverse;  /* text ← arrow→ (arrowhead on right) */
   }
 
-  /* Vol up: left:-7px, top:150px, h:60px → center at top:180px */
+  /* ── Vol Up: anchored to left edge of screen, pointing LEFT ── */
+  /* btn-vol-up center from phone top = 150+30=180px; screen top=16px → 180-16=164px from screen top */
   .arrow-vol-up {
-    left: 0;
-    top: 180px;
-    transform: translate(-100%, -50%); /* push entirely outside phone to the left */
-    flex-direction: row-reverse; /* text then SVG arrow */
-    padding-left: 4px;
+    left: 8px;
+    top: 164px;
+    transform: translateY(-50%);
+    flex-direction: row;          /* arrowhead on left, text on right */
   }
 
-  /* Vol down: left:-7px, top:222px, h:60px → center at top:252px */
+  /* ── Vol Down: btn-vol-down center = 222+30=252px; 252-16=236px from screen top ── */
   .arrow-vol-down {
-    left: 0;
-    top: 252px;
-    transform: translate(-100%, -50%);
-    flex-direction: row-reverse;
-    padding-left: 4px;
+    left: 8px;
+    top: 236px;
+    transform: translateY(-50%);
+    flex-direction: row;
   }
 
-  /* SVG arrow lines */
   .arrow-svg {
     overflow: visible;
     flex-shrink: 0;
   }
 
-  @media (max-width: 580px) {
-    /* On narrow screens hide arrow labels to avoid overflow */
-    .btn-arrows { display: none; }
+  /* Always show — no media query hiding since arrows are inside screen */
+  /* Hide arrows once phone is on — they served their purpose */
+  .phone.on .btn-arrows {
+    display: none;
   }
 
   /* === INSTRUCTIONS === */
@@ -684,37 +694,37 @@
     <div class="btn-vol-up" id="btnVolUp"></div>
     <div class="btn-vol-down" id="btnVolDown"></div>
 
-    <!-- Arrow labels (inside phone, overflow:visible so they appear outside frame) -->
-    <div class="btn-arrows">
-      <!-- Power: right side -->
-      <div class="arrow-label arrow-power">
-        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
-          <line x1="0" y1="7" x2="26" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
-          <polygon points="26,3 32,7 26,11" fill="#555"/>
-        </svg>
-        <div class="arrow-label-text">電源鍵</div>
-      </div>
-      <!-- Vol Up: left side -->
-      <div class="arrow-label arrow-vol-up">
-        <div class="arrow-label-text">音量 +</div>
-        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
-          <line x1="32" y1="7" x2="6" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
-          <polygon points="6,3 0,7 6,11" fill="#555"/>
-        </svg>
-      </div>
-      <!-- Vol Down: left side -->
-      <div class="arrow-label arrow-vol-down">
-        <div class="arrow-label-text">音量 −</div>
-        <svg class="arrow-svg" width="32" height="14" viewBox="0 0 32 14">
-          <line x1="32" y1="7" x2="6" y2="7" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/>
-          <polygon points="6,3 0,7 6,11" fill="#555"/>
-        </svg>
-      </div>
-    </div>
-
     <!-- Screen -->
     <div class="screen" id="screen">
       <div class="wallpaper"></div>
+
+      <!-- Arrow labels — inside screen, always visible, never overflow -->
+      <div class="btn-arrows" id="btnArrows">
+        <!-- Power: right side — label+arrow pointing toward right bezel -->
+        <div class="arrow-label arrow-power">
+          <div class="arrow-label-text">電源鍵</div>
+          <svg class="arrow-svg" width="36" height="14" viewBox="0 0 36 14">
+            <line x1="0" y1="7" x2="30" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <polygon points="30,3 36,7 30,11" fill="rgba(255,255,255,0.85)"/>
+          </svg>
+        </div>
+        <!-- Vol Up: left side — arrow pointing toward left bezel, label on right -->
+        <div class="arrow-label arrow-vol-up">
+          <svg class="arrow-svg" width="36" height="14" viewBox="0 0 36 14">
+            <line x1="36" y1="7" x2="6" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <polygon points="6,3 0,7 6,11" fill="rgba(255,255,255,0.85)"/>
+          </svg>
+          <div class="arrow-label-text">音量 +</div>
+        </div>
+        <!-- Vol Down: left side -->
+        <div class="arrow-label arrow-vol-down">
+          <svg class="arrow-svg" width="36" height="14" viewBox="0 0 36 14">
+            <line x1="36" y1="7" x2="6" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <polygon points="6,3 0,7 6,11" fill="rgba(255,255,255,0.85)"/>
+          </svg>
+          <div class="arrow-label-text">音量 −</div>
+        </div>
+      </div>
 
       <!-- Notch -->
       <div class="notch">
